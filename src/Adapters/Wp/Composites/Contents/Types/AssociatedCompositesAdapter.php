@@ -27,10 +27,12 @@ class AssociatedCompositesAdapter extends AbstractContentAdapter implements Asso
     public function getComposites(): ?Collection
     {
         $composites = collect(array_get($this->acfArray, 'composites', []))
-            ->map(function (\WP_Post $post) {
+            ->reject(function ($post) {
+                return !$post instanceof \WP_Post;
+            })->map(function (\WP_Post $post) {
                 $composite = WpModelRepository::instance()->getPost($post);
                 return new Composite(new CompositeAdapter($composite));
-            });
+            })->values();
 
         return $composites->isNotEmpty() ? $composites : null;
     }
