@@ -2,34 +2,40 @@
 
 namespace Bonnier\Willow\Base\Adapters\Wp\Root;
 
+use Bonnier\Willow\Base\Adapters\Wp\Root\LinkAdapter;
 use Bonnier\Willow\Base\Models\Contracts\Root\HyperlinkContract;
+use Bonnier\Willow\Base\Models\Contracts\Widgets\CommercialSpotHyperlinkContract;
 
 class HyperlinkAdapter implements HyperlinkContract
 {
-    protected $image;
+    protected $link;
+    protected $relationship;
+    protected $target;
 
-    public function __construct(ImageAdapter $image)
+    public function __construct(LinkAdapter $link, string $relationship = null, string $target = null)
     {
-        $this->image = $image;
+        $this->link = $link;
+        $this->relationship = $relationship;
+        $this->target = $target;
     }
 
     public function getTitle(): ?string
     {
-        return optional($this->image)->getTitle() ?: null;
+        return $this->link->getTitle() ?: null;
     }
 
     public function getUrl(): ?string
     {
-        return optional($this->image)->getUrl() ?: null;
+        return $this->link->getUrl() ?: null;
     }
 
     public function getRelationship(): ?string
     {
-        return null;
+        return $this->relationship ?: null;
     }
 
     public function getTarget(): ?string
     {
-        return null;
+        return $this->target ?: null;
     }
 }

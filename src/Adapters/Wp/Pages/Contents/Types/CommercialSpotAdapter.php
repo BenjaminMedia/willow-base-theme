@@ -2,8 +2,9 @@
 
 namespace Bonnier\Willow\Base\Adapters\Wp\Pages\Contents\Types;
 
+use Bonnier\Willow\Base\Adapters\Wp\Root\LinkAdapter;
 use Bonnier\Willow\Base\Adapters\Wp\Pages\Contents\AbstractContentAdapter;
-use Bonnier\Willow\Base\Adapters\Wp\Pages\Contents\Types\Partials\CommercialSpotHyperlink;
+use Bonnier\Willow\Base\Adapters\Wp\Root\HyperlinkAdapter;
 use Bonnier\Willow\Base\Adapters\Wp\Root\ImageAdapter;
 use Bonnier\Willow\Base\Models\Contracts\Pages\Contents\Types\CommercialSpotContract;
 use Bonnier\Willow\Base\Repositories\WpModelRepository;
@@ -38,10 +39,9 @@ class CommercialSpotAdapter extends AbstractContentAdapter implements Commercial
     public function getLink(): ?HyperlinkContract
     {
         if (($link = array_get($this->acfArray, 'link')) && ($label = array_get($this->acfArray, 'link_label'))) {
-            return new Hyperlink(new CommercialSpotHyperlink(
-                $link,
-                $label
-            ));
+            return new Hyperlink(
+                new HyperlinkAdapter(new LinkAdapter($link, $label))
+            );
         }
 
         return null;
