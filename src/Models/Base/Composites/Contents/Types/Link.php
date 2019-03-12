@@ -3,7 +3,7 @@
 namespace Bonnier\Willow\Base\Models\Base\Composites\Contents\Types;
 
 use Bonnier\Willow\Base\Models\Base\Composites\Contents\AbstractContent;
-use Bonnier\Willow\Base\Models\Contracts\Root\LinkContract;
+use Bonnier\Willow\Base\Models\Contracts\Composites\Contents\Types\LinkContract;
 
 /**
  * Class Link
@@ -17,7 +17,7 @@ class Link extends AbstractContent implements LinkContract
     /**
      * Link constructor.
      *
-     * @param \Bonnier\Willow\Base\Models\Contracts\Root\LinkContract $link
+     * @param Bonnier\Willow\Base\Models\Contracts\Composites\Contents\Types\LinkContract; $link
      */
     public function __construct(LinkContract $link)
     {
