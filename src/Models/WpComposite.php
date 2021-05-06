@@ -91,11 +91,13 @@ class WpComposite
         });
 
         add_action('save_post', [__CLASS__, 'onSave'], 10, 2);
+        add_action('save_post', [__CLASS__, 'onSaveRequiredTitle'], 10, 2);
         add_action('save_post', [__CLASS__, 'onSaveSlugChange'], 5, 2);
         add_action('added_term_relationship', [__CLASS__, 'addedTermRelationship'], 10, 3);
         add_action('acf/save_post', [EstimatedReadingTime::class, 'addEstimatedReadingTime'], 20);
         add_filter('pll_copy_post_metas', [__CLASS__, 'checkIfTermIsTranslated'], 10, 3);
         add_filter('pll_copy_post_metas', [__CLASS__, 'checkIfTermIsTranslated'], 10, 3);
+        add_action('admin_notices', [__CLASS__, 'compositePostErrorAdminMessage']);
     }
 
     /**
@@ -186,6 +188,51 @@ class WpComposite
             }
         }
         add_action('save_post', [__CLASS__, 'onSaveSlugChange'], 5, 2);
+    }
+
+    public static function onSaveRequiredTitle($postId, \WP_Post $post)
+    {
+        $errors = [];
+        $title = $post->post_title;
+        if (!$title) {
+            $errors['title'] = "The title is required";
+        }
+        if (!empty($errors)) {
+            remove_action('save_post', [__CLASS__, 'onSaveRequiredTitle']);
+            update_option('composite_errors', $errors);
+            $post->post_status = 'draft';
+            wp_update_post($post);
+            add_action('save_post', [__CLASS__, 'onSaveRequiredTitle']);
+            add_filter('redirect_post_location', [__CLASS__, 'compositeRedirectFilter'], 10, 2);
+        }
+    }
+
+    public static function compositeRedirectFilter($location)
+    {
+        $location = remove_query_arg('message', $location);
+        $location = add_query_arg('composite', 'error', $location);
+        return $location;
+    }
+
+    public static function compositeErrorAdminMessage()
+    {
+        if (isset($_GET['composite']) && $_GET['composite'] == 'error'){
+            $errors = get_option('composite_errors');
+            delete_option('composite_errors');
+            $display = '<div id="notice" class="error"><ul>';
+            foreach ($errors as $error){
+                $display .= '<li>' . $error . '</li>';
+            }
+            $display .= '</ul></div>';
+            echo $display;
+            ?>
+            <script>
+                jQuery(function($){
+                    $("#title").css({"border": "1px solid red"})
+                });
+            </script>
+            <?php
+        }
     }
 
     public static function addedTermRelationship(int $postID, int $termID, string $taxonomy)
