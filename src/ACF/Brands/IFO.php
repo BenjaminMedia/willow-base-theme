@@ -53,6 +53,9 @@ class IFO extends Brand
         $videoWidget = CompositeFieldGroup::getVideoWidget();
         add_filter(sprintf('willow/acf/layout=%s', $videoWidget->getKey()), [__CLASS__, 'setIncludeIntroVideoDefaultTrue']);
 
+        $linkWidget = CompositeFieldGroup::getLinkWidget();
+        add_filter(sprintf('willow/acf/layout=%s', $linkWidget->getKey()), [__CLASS__, 'addLinkWidgetDisplayHints']);
+
         $fileWidget = CompositeFieldGroup::getFileWidget();
         add_filter(sprintf('willow/acf/layout=%s', $fileWidget->getKey()), [__CLASS__, 'removeRequiredFromFileWidgetImages']);
     }
@@ -156,6 +159,22 @@ class IFO extends Brand
             }
             return $field;
         });
+    }
+
+    public static function addLinkWidgetDisplayHints(ACFLayout $link)
+    {
+        $displayHint = new RadioField('field_5f916f115010d');
+        $displayHint->setLabel('Display Format')
+            ->setName('display_hint')
+            ->setChoice('default', 'Default')
+            ->setChoice('small_button', 'Small button')
+            ->setChoice('large_button', 'Large button')
+            ->setChoice('large_button_centered', 'Large button centered')
+            ->setDefaultValue('default')
+            ->setLayout('vertical')
+            ->setReturnFormat(ACFField::RETURN_VALUE);
+
+        return $link->addSubField($displayHint);
     }
 
     public static function removeRequiredFromFileWidgetImages(ACFLayout $fileWidget)
