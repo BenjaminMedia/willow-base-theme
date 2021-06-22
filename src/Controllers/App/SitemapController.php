@@ -89,7 +89,12 @@ class SitemapController extends WP_REST_Controller
 
         return $this->sitemapResponse(new SitemapCollection(new SitemapCollectionAdapter($type, $sitemaps->map(
             function ($content) {
-                return new SitemapItem(new SitemapAdapter($content));
+               $url = new SitemapAdapter($content);
+
+               $headers = @get_headers($url->getUrl());
+                if($headers && strpos( $headers[0], '200')) {
+                    return new SitemapItem(new SitemapAdapter($content));
+                }
             }
         ))));
     }
