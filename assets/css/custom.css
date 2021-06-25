@@ -1,0 +1,3 @@
+.acf-media-modal.-edit .media-sidebar .attachment-details .setting[data-setting=title]{
+    display: none;
+}
