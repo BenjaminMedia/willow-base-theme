@@ -37,3 +37,14 @@ function ddHtml(...$args)
 
     die(1);
 }
+
+function try_redirect_url() {
+    require($_SERVER['DOCUMENT_ROOT'].'/wp/wp-load.php');
+    global $wpdb;
+    $from = $_SERVER['REQUEST_URI'];
+    $get_to = $wpdb->get_results("SELECT `to`, `code` FROM `wp_bonnier_redirects` WHERE `from` = '". $from ."'");
+    if(!empty($get_to[0])){
+      header($get_to[0]->to,TRUE,$get_to[0]->code);
+    }
+}
+add_action( 'admin_enqueue_scripts', 'try_redirect_url' );
