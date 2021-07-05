@@ -72,3 +72,7 @@ div.image-focalpoint-actions .dashicons-no {
   overflow-y: scroll;
   max-height: 70%;
 }
+
+.select2-container{
+  width: 100%!important;  
+}
