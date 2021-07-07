@@ -2,6 +2,7 @@
 
 namespace Bonnier\Willow\Base\Repositories\WhiteAlbum;
 
+use Bonnier\WP\Redirect\Helpers\LocaleHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\TransferStats;
@@ -71,6 +72,21 @@ class RedirectRepository
         return null;
     }
 
+    private function waTestUrl($to)
+    {
+        $domains = LocaleHelper::getLocalizedUrls();
+
+        $url = null;
+        $domain = $domains[$this->locale] ?? null;
+        if (substr($to->getTo(), 0, 1) !== '/') {
+            $url = $to->getTo();
+        } else if ($domain) {
+            $url = sprintf('%s/%s', rtrim($domain, '/'), ltrim($to->getTo(), '/'));
+        }
+
+        return $url;
+    }
+
     private function recursiveRedirectResolve($url)
     {
         /** @var null|UriInterface $destination */
@@ -85,6 +101,22 @@ class RedirectRepository
             $response = $exception->getResponse();
         }
         $to = optional($destination)->getPath() ?: '/';
+
+        try {
+            $secondUrl= $this->waTestUrl($to);
+            $client = new Client();
+            $client->head($secondUrl);
+        } catch (RequestException $exception) {
+            // error 600 means not found on from url and to url
+            $this->storeResolvedRedirect(
+                $url,
+                $to,
+                600
+            );
+
+            return null;
+        }
+
         if (
             $destination &&
             ($destination->getHost() !== $this->domain && $destination->getHost() !== sprintf('old.%s', $this->domain))
