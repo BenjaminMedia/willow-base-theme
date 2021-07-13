@@ -203,6 +203,10 @@ class WpModelRepository
         }
 
         $postMeta = get_post_meta($wpPostId);
+        if(isset($postMeta['description'][0]) && empty($postMeta['description'][0])){
+            $pageID = get_option('page_on_front');
+            update_post_meta($wpPostId, 'description', get_post_meta( $pageID, 'teaser_description' )[0]);
+        }        
         $this->postMeta->put($wpPostId, $postMeta);
 
         return $postMeta;
